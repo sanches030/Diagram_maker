@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include "lang_syntax/lang.h"
 
 #define MAX_PATH_LEN 100
 
@@ -38,7 +39,7 @@ void file_formatting(FILE* fptr, Language lang) {
     char data[4096];
     while (fgets(data, sizeof(data), fptr) != NULL){
         switch (lang){
-            case C:
+            case C: //fprintf()
                 break;
             case CPP:
                 break;
