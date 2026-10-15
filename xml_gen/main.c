@@ -1,5 +1,7 @@
+#include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdbool.h>
 #include "lang_syntax/lang.h"
 
 #define MAX_PATH_LEN 100
@@ -9,14 +11,6 @@ typedef enum FileMode{
     WRITE,
     APPEND
 } FileMode;
-
-typedef enum Language {
-    C,
-    CPP,
-    CS,
-    CSS,
-    RS
-} Language;
 
 FILE *open_file(FileMode mode, const char *path) {
     FILE *fptr;
@@ -45,21 +39,58 @@ void file_formatting(FILE* fptr, Language lang) {
                 break;
             case CS:
                 break;
-            case CSS:
-                break;
             case RS:
                 break;
+            case PY:
+                break;
         }
-        fprintf(result, "%s\n", data);
+        //fprintf(result, "%s\n", data);
     }
-    fclose(source);
+    //fclose(source);
 }
 
+Language language_recognition(char* path){
+    const char *dot = strchr(path, '.');
+
+    if (dot == NULL){
+        return UNKNOWN;
+    }
+
+    const char *ext = dot + 1;
+
+    Language lang;
+
+    if (strcmp(ext, "c") == 0){
+        lang = C;
+    }
+    else if (strcmp(ext, "cpp") == 0){
+        lang = CPP;
+    }
+    else if (strcmp(ext, "cs") == 0){
+        lang = CS;
+    }
+    else if (strcmp(ext, "rs") == 0){
+        lang = RS;
+    }
+    else if (strcmp(ext, "py") == 0){
+        lang = PY;
+    }else{
+        lang = UNKNOWN;
+    }
+
+    return lang;
+}
+
+
 int main(void){
-    FILE *source = open_file(READ, "test.txt");
+    char *s = "text.cs";
+    char *r = "output.xml";
+
+    printf("THE LANG RECOGNIZED IS: %d\n", language_recognition(s));
+
+    FILE *source = open_file(READ, "test.cpp");
     FILE *result = open_file(WRITE, "output.xml");
 
-    
     int index = 1;
 
     if (source == NULL || result == NULL){
@@ -67,7 +98,7 @@ int main(void){
         return 0;
     }
     else{
-        file_formatting();
+        //file_formatting();
     }   
 
     return 0;

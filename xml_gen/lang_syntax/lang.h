@@ -3,12 +3,22 @@
 
 #include <stdlib.h>
 
+typedef enum Language {
+    C,
+    CPP,
+    CS,
+    RS,
+    PY,
+    UNKNOWN
+} Language;
+
+
 #define MAX_LENGTH_OF_C_KEYWORD 15
 typedef enum C_KEYWORDS{
     C_VOID,
     C_INT,
     C_DOUBLE,
-    C_LONG
+    C_LONG,
 } C_KEYWORDS;
 
 char* converting_c_syntax(C_KEYWORDS keyword);
