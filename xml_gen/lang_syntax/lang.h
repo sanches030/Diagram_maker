@@ -1,7 +1,9 @@
 #ifndef LANGUAGE_SYNTAX
 #define LANGUAGE_SYNTAX
 
+#include "../nodes/node.h"
 #include <stdlib.h>
+#include <string.h>
 
 typedef enum Language {
     C,
@@ -13,15 +15,17 @@ typedef enum Language {
 } Language;
 
 
-#define MAX_LENGTH_OF_C_KEYWORD 15
-typedef enum C_KEYWORDS{
-    C_VOID,
-    C_INT,
-    C_DOUBLE,
-    C_LONG,
-} C_KEYWORDS;
 
-char* converting_c_syntax(C_KEYWORDS keyword);
+//for c
+NodeType c_recognition(char[] data){
+    if (strstr(data, "scanf")){
+        return NodeType::NODE_IO;
+    }else{
+        return NodeType::NODE_PROCESS;
+    }
+
+}
+
 
 
 #endif

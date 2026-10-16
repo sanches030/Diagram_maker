@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include "lang_syntax/lang.h"
+#include "nodes/node.h"
 
 #define MAX_PATH_LEN 100
 
@@ -29,11 +30,11 @@ FILE *open_file(FileMode mode, const char *path) {
 }
 
 
-void file_formatting(FILE* fptr, Language lang) {
+void file_formatting(FILE* fptr, Language lang, Node* head) { // maiun formattign happens here
     char data[4096];
     while (fgets(data, sizeof(data), fptr) != NULL){
         switch (lang){
-            case C: //fprintf()
+            case C: 
                 break;
             case CPP:
                 break;
@@ -44,9 +45,7 @@ void file_formatting(FILE* fptr, Language lang) {
             case PY:
                 break;
         }
-        //fprintf(result, "%s\n", data);
     }
-    //fclose(source);
 }
 
 Language language_recognition(char* path){
@@ -83,12 +82,15 @@ Language language_recognition(char* path){
 
 
 int main(void){
+
+    Node head = creating_node("idk yet");
+
     char *s = "text.cs";
     char *r = "output.xml";
 
     printf("THE LANG RECOGNIZED IS: %d\n", language_recognition(s));
 
-    FILE *source = open_file(READ, "test.cpp");
+    FILE *source = open_file(READ, "test.c");
     FILE *result = open_file(WRITE, "output.xml");
 
     int index = 1;
@@ -97,9 +99,11 @@ int main(void){
         printf("The file was not found\n");
         return 0;
     }
-    else{
-        //file_formatting();
-    }   
 
+    fprintf(result, "<code>\n");
+
+    //file_formatting();
+
+    fprintf(result, "</code>\n");
     return 0;
 }
