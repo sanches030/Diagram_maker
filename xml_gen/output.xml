@@ -1,11 +1,16 @@
-<program>program    <process>int main() {
-    </process>
-    <process>    int n = 0;
-    </process>
-    <process>    int limit = 10;
-    </process>
-    <decision>    if (n < limit) {
-        <decision>        if (n > 5) {
+<program>
+    <process>int x = 10</process>
+    <process>int y = 5</process>
+    <decision>
+        <process>x = x - y</process>
+        <decision>
+            <process>y = y + 1</process>
+            <process>x = x * 2</process>
         </decision>
+        <process>x = x + 3</process>
     </decision>
+    <decision>
+        <process>y = y - 1</process>
+    </decision>
+    <process>x = 0</process>
 </program>
