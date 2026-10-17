@@ -31,8 +31,13 @@
             <true>
             <process>x = 100</process>
             </true>
-            <false>
+        <decision>
+            <condition>x == 14</condition>
+            <true>
             <process>x = 200</process>
+            </true>
+            <false>
+            <process>x = 15</process>
             </false>
         </decision>
         </true>

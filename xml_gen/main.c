@@ -69,6 +69,7 @@ Language language_recognition(char* path){
     return lang;
 }
 
+
 typedef enum Type{
     //nested
     DECISION_START,
@@ -240,7 +241,10 @@ void write(Element* stack, FILE* result, int size){
         return;
 
     for (int i = 0; i < size; ++i){
-        switch (stack[i].type){
+        //TODO: somehow check if the if or else if are the last decision statements so that their end aka } mark the </decision>
+        //TODO: make support for loops
+        //TODO: when assiging some value to the variable (int x = 15) remove the data type keyword
+        switch (stack[i].type){ 
             case DECISION_START:
                 indent(result, stack[i].depth);
                 fprintf(result, "%s", "<decision>\n");
@@ -257,7 +261,7 @@ void write(Element* stack, FILE* result, int size){
                 break;
             case DECISION_ELSE:
                 indent(result, stack[i].depth + 1);
-                fprintf(result, "%s", "<false>\n"); //TODO: change the hierarchy so the true and false were children of decision, meaning that the else is the child of if(else if aswell).
+                fprintf(result, "%s", "<false>\n"); 
                 break;
             case DECISION_ELSE_END:
                 indent(result, stack[i].depth + 1);
@@ -265,6 +269,23 @@ void write(Element* stack, FILE* result, int size){
                 indent(result, stack[i].depth);
                 fprintf(result, "%s", "</decision>\n");
                 break;
+            case DECISION_ELSE_IF:
+                indent(result, stack[i].depth);
+                fprintf(result, "%s", "<false>\n");
+                indent(result, stack[i].depth);
+                fprintf(result, "%s", "<decision>\n");
+
+                indent(result, stack[i].depth + 1);
+                fprintf(result, "%s%s%s", "<condition>", stack[i].text, "</condition>\n");
+
+                indent(result, stack[i].depth + 1);
+                fprintf(result, "%s", "<true>\n");
+                break;
+            case DECISION_ELSE_IF_END:
+                indent(result, stack[i].depth + 1);
+                fprintf(result, "%s", "</true>\n");
+                break;
+
             case SUBPROCESS_START:
                 fprintf(result, "%s%s%s", "<subprocess>", stack[i].text, "\n");
                 break;
