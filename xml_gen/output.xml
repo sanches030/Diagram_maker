@@ -1,1 +1,11 @@
-<code></code>
+<program>program    <process>int main() {
+    </process>
+    <process>    int n = 0;
+    </process>
+    <process>    int limit = 10;
+    </process>
+    <decision>    if (n < limit) {
+        <decision>        if (n > 5) {
+        </decision>
+    </decision>
+</program>

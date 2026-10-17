@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>
+#include "hierarchy/hierarchy.h"
 #include "lang_syntax/lang.h"
-#include "nodes/node.h"
 
 #define MAX_PATH_LEN 100
 
@@ -29,24 +29,6 @@ FILE *open_file(FileMode mode, const char *path) {
     return fptr;
 }
 
-
-void file_formatting(FILE* fptr, Language lang, Node* head) { // maiun formattign happens here
-    char data[4096];
-    while (fgets(data, sizeof(data), fptr) != NULL){
-        switch (lang){
-            case C: 
-                break;
-            case CPP:
-                break;
-            case CS:
-                break;
-            case RS:
-                break;
-            case PY:
-                break;
-        }
-    }
-}
 
 Language language_recognition(char* path){
     const char *dot = strchr(path, '.');
@@ -83,27 +65,26 @@ Language language_recognition(char* path){
 
 int main(void){
 
-    Node head = creating_node("idk yet");
-
-    char *s = "text.cs";
+    char *s = "test.c";
     char *r = "output.xml";
 
     printf("THE LANG RECOGNIZED IS: %d\n", language_recognition(s));
 
-    FILE *source = open_file(READ, "test.c");
-    FILE *result = open_file(WRITE, "output.xml");
-
-    int index = 1;
+    FILE *source = open_file(READ, s);
+    FILE *result = open_file(WRITE, r);
 
     if (source == NULL || result == NULL){
         printf("The file was not found\n");
         return 0;
     }
 
-    fprintf(result, "<code>\n");
 
-    //file_formatting();
-
-    fprintf(result, "</code>\n");
+    Node *head = reading(source);
+    if (head == NULL){
+        fclose(source);
+        fclose(result);
+        return 1;
+    }
+    write_nodes(head, result, 0);
     return 0;
 }
