@@ -72,6 +72,10 @@ Language language_recognition(char* path){
 typedef enum Type{
     //nested
     DECISION_START,
+    DECISION_ELSE_IF,
+    DECISION_ELSE,
+    DECISION_ELSE_END,
+    DECISION_ELSE_IF_END,
     DECISION_END,
     SUBPROCESS_START,
     SUBPROCESS_END,
@@ -88,6 +92,11 @@ typedef struct Element{
     int depth;
     char text[2048];
 } Element;
+
+void indent(FILE* fptr, int depth){
+    for (int i = 0; i < depth * 4; ++i)
+        fputc(' ', fptr);
+}
 
 bool strong_contains(const char* base, const char* target){
     if (strstr(base, target) != NULL)
@@ -123,7 +132,7 @@ int read(Element *stack, FILE* source){
 
     while (fgets(data, sizeof(data), source) != NULL){
         bool recognized = false;
-        if (strong_contains(data, " = ")){
+        if (strong_contains(data, " = ") && !strong_contains(data, "for")){
             recognized = true;
 
             int index = 0;
@@ -137,21 +146,43 @@ int read(Element *stack, FILE* source){
                     stack[i].text[index++] = data[j]; 
                 }
             }
-            stack[i].text[index - 2] = '\0';
+            stack[i].text[index - 2] = '\0';//TODO: change so that it won't be capturing the types of data like 'int' etc
                 
             stack[i].type = PROCESS;
-            stack[i].depth = depth;
+            stack[i].depth = depth; 
         }
         else if (strong_contains(data, "scanf(")){
             recognized = true;
             stack[i].type = IO;
             stack[i].depth = depth;
-        } else if (strong_contains(data, "if (")){
+        } else if (strong_contains(data, "if")){
             recognized = true;
             stack[i].type = DECISION_START;
             stack[i].depth = depth;
-        
+
+            int index = 0;
+            bool found = false;
+
+            for (int j = 0; j < strlen(data); ++j){
+                if (data[j] == '('){
+                    found = true;
+                    ++j;
+                }
+                if (found){
+                    stack[i].text[index++] = data[j]; 
+                }
+            }
+            stack[i].text[index - 4] = '\0';
+
+            
             open_blocks[block_top++] = DECISION_START;
+            ++depth;
+        }
+        else if (strong_contains(data, "else")){
+            recognized = true;
+            stack[i].type = DECISION_ELSE;
+            stack[i].depth = depth;
+            open_blocks[block_top++] = DECISION_ELSE;
             ++depth;
         }
         else if (strong_contains(data, "int main(")){
@@ -180,6 +211,10 @@ int read(Element *stack, FILE* source){
                         stack[i].type = SUBPROCESS_END;
                         break;
 
+                    case DECISION_ELSE:
+                        stack[i].type = DECISION_ELSE_END;
+                        break;
+
                     case PROGRAM_START:
                         stack[i].type = PROGRAM_END;
                         break;
@@ -205,40 +240,48 @@ void write(Element* stack, FILE* result, int size){
         return;
 
     for (int i = 0; i < size; ++i){
-        for (int j = 0; j < stack[i].depth * 4; ++j)
-            fputc(' ', result);
-
         switch (stack[i].type){
             case DECISION_START:
-                printf("DECISION_START\n");
-                fprintf(result, "%s%s%s", "<decision>", stack[i].text, "\n");
+                indent(result, stack[i].depth);
+                fprintf(result, "%s", "<decision>\n");
+
+                indent(result, stack[i].depth + 1);
+                fprintf(result, "%s%s%s", "<condition>", stack[i].text, "</condition>\n");
+
+                indent(result, stack[i].depth + 1);
+                fprintf(result, "%s", "<true>\n");
                 break;
             case DECISION_END:
-                printf("DECISION_END\n");
+                indent(result, stack[i].depth + 1);
+                fprintf(result, "%s", "</true>\n");
+                break;
+            case DECISION_ELSE:
+                indent(result, stack[i].depth + 1);
+                fprintf(result, "%s", "<false>\n"); //TODO: change the hierarchy so the true and false were children of decision, meaning that the else is the child of if(else if aswell).
+                break;
+            case DECISION_ELSE_END:
+                indent(result, stack[i].depth + 1);
+                fprintf(result, "%s", "</false>\n");
+                indent(result, stack[i].depth);
                 fprintf(result, "%s", "</decision>\n");
                 break;
             case SUBPROCESS_START:
-                printf("SUBPROCESS_START\n");
                 fprintf(result, "%s%s%s", "<subprocess>", stack[i].text, "\n");
                 break;
             case SUBPROCESS_END:
-                printf("SUBPROCESS_END\n");
                 fprintf(result, "%s", "</subprocess>\n");
                 break;
             case PROGRAM_START:
-                printf("PROGRAM_START\n");
                 fprintf(result, "%s%s%s", "<program>", stack[i].text, "\n");
                 break;
             case PROGRAM_END:
-                printf("PROGRAM_END\n");
                 fprintf(result, "%s", "</program>\n");
                 break;
             case PROCESS:
-                printf("PROCESS\n");
+                indent(result, stack[i].depth);
                 fprintf(result, "%s%s%s", "<process>", stack[i].text, "</process>\n");
                 break;
             case IO:
-                printf("IO\n");
                 fprintf(result, "%s%s%s", "<io></io>", stack[i].text, "\n");
                 break;
         }

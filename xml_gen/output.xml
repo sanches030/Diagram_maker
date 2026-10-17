@@ -2,15 +2,38 @@
     <process>int x = 10</process>
     <process>int y = 5</process>
     <decision>
+        <condition>x > y</condition>
+        <true>
         <process>x = x - y</process>
         <decision>
+            <condition>x > 0</condition>
+            <true>
             <process>y = y + 1</process>
             <process>x = x * 2</process>
-        </decision>
+            </true>
         <process>x = x + 3</process>
+        </true>
+        <false>
+        <decision>
+            <condition>y > 0</condition>
+            <true>
+            <process>y = y - 1</process>
+            </true>
+        <process>x = 0</process>
+        </false>
     </decision>
+    <process>y = y + x</process>
     <decision>
-        <process>y = y - 1</process>
-    </decision>
-    <process>x = 0</process>
+        <condition>x == 0</condition>
+        <true>
+        <decision>
+            <condition>y > 0</condition>
+            <true>
+            <process>x = 100</process>
+            </true>
+            <false>
+            <process>x = 200</process>
+            </false>
+        </decision>
+        </true>
 </program>
